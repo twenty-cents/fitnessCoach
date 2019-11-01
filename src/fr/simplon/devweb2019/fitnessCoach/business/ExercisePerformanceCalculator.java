@@ -1,7 +1,8 @@
 package fr.simplon.devweb2019.fitnessCoach.business;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import fr.simplon.devweb2019.fitnessCoach.common.FloatHelper;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
@@ -72,6 +73,61 @@ public class ExercisePerformanceCalculator {
     }
 
     /**
+     * Add a new set in an exercise
+     * @param path : csv file to analyze
+     * @param exerciseName : exercise name
+     * @param repetitions : number of repetitions
+     * @param weight : weight lifted
+     * @throws FileNotFoundException
+     */
+    public void addSet(String path, String exerciseName, int repetitions, float weight) throws IOException {
+        // Load existing exercises
+        ArrayList<Exercise> exercises = loadSets(path);
+        boolean isSetAdded = false;
+
+        // Add the new set in an existing exercise
+        for(Exercise exercise : exercises){
+            if(exercise.getName().compareTo(exerciseName) == 0){
+                exercise.addSet(repetitions, weight);
+                isSetAdded = true;
+                break;
+            }
+        }
+
+        // If the exercise doesn't exist, create a new one
+        if(isSetAdded == false){
+            // Create a new exercise
+            Exercise exercise = new Exercise(exerciseName);
+            // Add the new set
+            exercise.addSet(repetitions, weight);
+            // Save the new exercise in the exercises list
+            exercises.add(exercise);
+        }
+
+        // Sort exercises ascending
+        Collections.sort(exercises);
+
+        // Save exercises
+        saveExercises(path, exercises);
+    }
+
+    /**
+     * Save exercises in a csv file
+     * @param path : csv file to save
+     * @param exercises : exercises list
+     * @throws FileNotFoundException
+     */
+    private void saveExercises(String path, ArrayList<Exercise> exercises) throws IOException {
+        FileWriter writer = new FileWriter(path);
+        BufferedWriter buffer = new BufferedWriter(writer);
+
+        for(Exercise exercise : exercises){
+            buffer.write(exercise.toString());
+        }
+        buffer.close();
+    }
+
+    /**
      * Calculate the average weight by set on an exercise
      * @param exercise : the exercise to analyze
      * @return : the average weight by set
@@ -87,7 +143,7 @@ public class ExercisePerformanceCalculator {
             averageWeight = averageWeight / exercise.getSets().size();
         }
 
-        return averageWeight;
+        return FloatHelper.round(averageWeight, 2);
     }
 
     /**
@@ -112,7 +168,10 @@ public class ExercisePerformanceCalculator {
             if(weights.size() % 2 == 0){
                 // The number of values is even
                 // -> the median is the half-sum of the two middle values
-                medianWeight = ((weights.get((weights.size() / 2) -1)) + (weights.get(weights.size() / 2))) / 2;
+                float numerator = weights.get((weights.size() / 2) -1);
+                float denominator = weights.get(weights.size() / 2);
+                //medianWeight = ((weights.get((weights.size() / 2) -1)) + (weights.get(weights.size() / 2))) / 2;
+                medianWeight = numerator / denominator;
             } else {
                 // If the number of values is odd
                 // -> the median is the middle value
@@ -120,7 +179,7 @@ public class ExercisePerformanceCalculator {
             }
         }
 
-        return medianWeight;
+        return FloatHelper.round(medianWeight, 2);
     }
 
     /**
@@ -137,7 +196,7 @@ public class ExercisePerformanceCalculator {
             }
         }
 
-        return maxWeight;
+        return FloatHelper.round(maxWeight, 2);
     }
 
     /**
@@ -154,7 +213,7 @@ public class ExercisePerformanceCalculator {
             }
         }
 
-        return maxWeight;
+        return FloatHelper.round(maxWeight, 2);
     }
 
     /**
@@ -175,7 +234,7 @@ public class ExercisePerformanceCalculator {
             averageWeight = averageWeight / repetitions;
         }
 
-        return averageWeight;
+        return FloatHelper.round(averageWeight, 2);
     }
 
     /**
@@ -200,7 +259,10 @@ public class ExercisePerformanceCalculator {
             if(weights.size() % 2 == 0){
                 // Si le nombre de valeurs est pair
                 // -> la médiane est la demi-somme des deux valeurs du milieu
-                medianWeight = ((weights.get((weights.size() / 2) -1)) + (weights.get(weights.size() / 2)) /  2);
+                float numerator = weights.get((weights.size() / 2) -1);
+                float denominator = weights.get(weights.size() / 2);
+                //medianWeight = ((weights.get((weights.size() / 2) -1)) + (weights.get(weights.size() / 2)) /  2);
+                medianWeight = numerator / denominator;
             } else {
                 // Si le nombre de valeurs est impair
                 // -> la médiane est la valeur du milieu
@@ -208,7 +270,7 @@ public class ExercisePerformanceCalculator {
             }
         }
 
-        return medianWeight;
+        return FloatHelper.round(medianWeight, 2);
     }
 
     /**
@@ -227,7 +289,7 @@ public class ExercisePerformanceCalculator {
             averageRepetitions = averageRepetitions / exercise.getSets().size();
         }
 
-        return averageRepetitions;
+        return FloatHelper.round(averageRepetitions, 2);
     }
 
     /**
@@ -252,7 +314,10 @@ public class ExercisePerformanceCalculator {
             if(repetitions.size() % 2 == 0){
                 // Si le nombre de valeurs est pair
                 // -> la médiane est la demi-somme des deux valeurs du milieu
-                medianRepetitions = Float.intBitsToFloat((repetitions.get((repetitions.size() / 2) -1)) + (repetitions.get(repetitions.size() / 2))) / 2;
+                float numerator = repetitions.get((repetitions.size() / 2) -1);
+                float denominator = repetitions.get(repetitions.size() / 2);
+                //medianRepetitions = Float.intBitsToFloat((repetitions.get((repetitions.size() / 2) -1)) + (repetitions.get(repetitions.size() / 2))) / 2;
+                medianRepetitions = (numerator + denominator) / 2;
             } else {
                 // Si le nombre de valeurs est impair
                 // -> la médiane est la valeur du milieu
@@ -260,7 +325,7 @@ public class ExercisePerformanceCalculator {
             }
         }
 
-        return medianRepetitions;
+        return FloatHelper.round(medianRepetitions, 2);
     }
 
     /**
@@ -277,7 +342,7 @@ public class ExercisePerformanceCalculator {
             }
         }
 
-        return maxRepetitions;
+        return FloatHelper.round(maxRepetitions, 2);
     }
 
 }

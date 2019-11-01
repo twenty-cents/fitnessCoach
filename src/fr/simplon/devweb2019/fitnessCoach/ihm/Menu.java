@@ -4,6 +4,7 @@ import fr.simplon.devweb2019.fitnessCoach.business.Exercise;
 import fr.simplon.devweb2019.fitnessCoach.business.ExercisePerformanceCalculator;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -12,6 +13,7 @@ public class Menu {
     private final String applicationTitle = "Fitness Coach";
     private final String inputMessage = "Entrez votre choix : ";
     private final String errorMessage = "Saisie incorrecte, veuillez ôter vos mouffles...";
+    private final String errorMessageNumericPositive = "Le nombre saisi doit être supérieur à zéro.";
     private final String switchOptionErrorMessage = "Cas non prévu, veuillez contacter le support informatique";
 
     private final String averageWeightLifted = "Poids moyen levé : ";
@@ -19,10 +21,14 @@ public class Menu {
     private final String maximumWeightLifted = "Poids maximum levé : ";
 
     private final String averageRepetitions = "Nombre moyen de répétitions : ";
-    private final String medianRepetitions = "Nombre moyen de répétitions : ";
-    private final String maximumRepetitions = "Nombre moyen de répétitions : ";
+    private final String medianRepetitions = "Nombre médian de répétitions : ";
+    private final String maximumRepetitions = "Nombre maximum de répétitions : ";
 
     private final String weightUnit = " kg";
+
+    private final String addSetExercise = "Nom de l'exercice : ";
+    private final String addSetRepetitions = "Nombre de répétition(s) : ";
+    private final String addSetWeight = "Poids levé : ";
 
     private static ArrayList<String> mainMenu;
 
@@ -51,11 +57,13 @@ public class Menu {
         performanceCalculator = new ExercisePerformanceCalculator();
     }
 
+    private String pathExercises;
+
     /**
      * Constructor
      */
-    public Menu() {
-
+    public Menu(String pathExercises) {
+        this.pathExercises = pathExercises;
         executeMenuMain();
     }
 
@@ -71,6 +79,7 @@ public class Menu {
 
             switch (option) {
                 case 1:
+                    addSet();
                     break;
                 case 2:
                     executeMenuPerformance();
@@ -86,6 +95,24 @@ public class Menu {
         // Exit application
         System.out.println("Au revoir!");
         System.exit(0);
+    }
+
+    /**
+     * Add a new set
+     */
+    private void addSet(){
+        String ex = inputString(addSetExercise);
+        int repetitions = inputInteger(addSetRepetitions);
+        float weight = inputFloat(addSetWeight);
+
+        try {
+            performanceCalculator.addSet(pathExercises,
+                    ex,
+                    repetitions,
+                    weight);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -123,8 +150,7 @@ public class Menu {
 
         // Load the exercises file
         try {
-            //exercises = performanceCalculator.loadSets("C:/Home/Dev/Src/IdeaProjects/fitnessCoach/sets/bernard.csv");
-            exercises = performanceCalculator.loadSets("./sets/bernard.csv");
+            exercises = performanceCalculator.loadSets(pathExercises);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -230,6 +256,78 @@ public class Menu {
         } while (option == -1);
 
         return option;
+    }
+
+    /**
+     * Input a text
+     * @param inputMessage : input message to display
+     * @return
+     */
+    private String inputString(String inputMessage){
+        String text = "";
+
+        do {
+            try {
+                System.out.print(inputMessage);
+                text = sc.nextLine();
+                if (text.compareToIgnoreCase("") <= 0) {
+                    throw new Exception("");
+                }
+            } catch (Exception e) {
+                System.out.println(errorMessage);
+                text = "";
+            }
+        } while (text == "");
+
+        return text;
+    }
+
+    /**
+     * Input an integer
+     * @param inputMessage : input message to display
+     * @return
+     */
+    private int inputInteger(String inputMessage){
+        int res = -1;
+
+        do {
+            try {
+                System.out.print(inputMessage);
+                res = Integer.parseInt(sc.nextLine());
+                if (res <= 0) {
+                    throw new Exception("");
+                }
+            } catch (Exception e) {
+                System.out.println(errorMessageNumericPositive);
+                res = -1;
+            }
+        } while (res == -1);
+
+        return res;
+    }
+
+    /**
+     * Input a float
+     * @param inputMessage : input message to display
+     * @return
+     */
+    private float inputFloat(String inputMessage){
+        float res = -1;
+
+        do {
+            try {
+                System.out.print(inputMessage);
+                res = Float.parseFloat(sc.nextLine());
+                if (res <= 0) {
+                    throw new Exception("");
+                }
+            } catch (Exception e) {
+                System.out.println(errorMessageNumericPositive);
+                res = -1;
+            }
+        } while (res == -1);
+
+        return res;
     }
 
     /**

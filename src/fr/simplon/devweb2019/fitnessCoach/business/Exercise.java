@@ -64,10 +64,11 @@ public class Exercise implements Comparable<Exercise> {
      */
     @Override
     public String toString() {
-        return "Exercise{" +
-                "exercise='" + name + '\'' +
-                ", sets=" + sets +
-                "}\n";
+        String s = "";
+        for(ExerciseSet set : sets){
+            s += name + ";" + set.toString() + "\n";
+        }
+        return s;
     }
 
     /**

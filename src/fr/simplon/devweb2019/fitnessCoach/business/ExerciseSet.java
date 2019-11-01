@@ -46,10 +46,7 @@ public class ExerciseSet {
      */
     @Override
     public String toString() {
-        return "ExerciseSet{" +
-                "repetitions=" + repetitions +
-                ", weight=" + weight +
-                '}';
+        return repetitions + ";" + weight;
     }
 
     /**
